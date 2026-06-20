@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Item</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f9;
+      color: #222;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 600;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Order Item</h1>
+    <form id="orderForm">
+      <label for="itemName">Item name</label>
+      <input type="text" id="itemName" name="itemName" placeholder="e.g. T-shirt" required />
+
+      <label for="quantity">Quantity</label>
+      <input type="number" id="quantity" name="quantity" min="1" value="1" required />
+
+      <label for="price">Price per item ($)</label>
+      <input type="number" id="price" name="price" min="0" step="0.01" value="10.00" required />
+
+      <button type="submit">Place Order</button>
+    </form>
+
+    <div id="orderResult" class="result" hidden>
+      <p><strong>Order summary:</strong></p>
+      <p id="summaryText"></p>
+      <p id="totalText"></p>
+      <p id="trackingText"></p>
+      <button id="trackButton" type="button" hidden>Track order</button>
+      <p id="statusText" hidden></p>
+    </div>
+  </div>
+
+  <script>
+    const orderForm = document.getElementById('orderForm');
+    const orderResult = document.getElementById('orderResult');
+    const summaryText = document.getElementById('summaryText');
+    const totalText = document.getElementById('totalText');
+    const trackingText = document.getElementById('trackingText');
+    const trackButton = document.getElementById('trackButton');
+    const statusText = document.getElementById('statusText');
+
+    const orderStatuses = ['Order received', 'Processing', 'Shipped', 'Out for delivery', 'Delivered'];
+    let statusIndex = 0;
+
+    function createTrackingNumber() {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const prefix = letters.charAt(Math.floor(Math.random() * letters.length)) + letters.charAt(Math.floor(Math.random() * letters.length));
+      const number = Math.floor(100000 + Math.random() * 900000);
+      return `${prefix}-${number}`;
+    }
+
+    orderForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const itemName = document.getElementById('itemName').value.trim();
+      const quantity = Number(document.getElementById('quantity').value);
+      const price = Number(document.getElementById('price').value);
+
+      if (!itemName) {
+        alert('Please enter an item name.');
+        return;
+      }
+      if (quantity < 1 || price < 0) {
+        alert('Please enter a valid quantity and price.');
+        return;
+      }
+
+      const total = quantity * price;
+      const trackingNumber = createTrackingNumber();
+      statusIndex = 0;
+
+      summaryText.textContent = `You ordered ${quantity} × ${itemName} at $${price.toFixed(2)} each.`;
+      totalText.textContent = `Total: $${total.toFixed(2)}`;
+      trackingText.textContent = `Tracking number: ${trackingNumber}`;
+      statusText.textContent = orderStatuses[statusIndex];
+      statusText.hidden = true;
+      trackButton.hidden = false;
+      orderResult.hidden = false;
+    });
+
+    trackButton.addEventListener('click', function() {
+      if (statusIndex < orderStatuses.length - 1) {
+        statusIndex += 1;
+      }
+      statusText.textContent = orderStatuses[statusIndex];
+      statusText.hidden = false;
+    });
+  </script>
+</body>
+</html>
